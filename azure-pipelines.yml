@@ -11,17 +11,17 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
   name: 'NuGetToolInstaller'
-  displayName: 'NuGet tool installer'
+  displayName: 'NuGet Install'
 
 - task: NuGetCommand@2
   name: 'NuGetRestore'
-  displayName: 'NuGet restore packages'
+  displayName: 'NuGet Restore Packages'
   inputs:
     command: 'restore'
 
 - task: DotNetCoreCLI@2
   name: 'Tests'
-  displayName: 'Run tests'
+  displayName: 'Run Tests'
   inputs:
     command: 'test'
     arguments: '--configuration $(BuildConfiguration)'
@@ -29,6 +29,13 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
-    publishWebProjects: false
+    publishWebProjects: true
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: true
+  displayName: 'Publish'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: drop
+  displayName: 'Upload Artifact'
