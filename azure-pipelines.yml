@@ -5,12 +5,30 @@ pool:
   vmImage: windows-latest
 
 variables:
+  buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
 steps:
+- task: NuGetToolInstaller@1
+  name: 'NuGetToolInstaller'
+  displayName: 'NuGet tool installer'
+
+- task: NuGetCommand@2
+  name: 'NuGetRestore'
+  displayName: 'NuGet restore packages'
+  inputs:
+    command: 'restore'
+
+- task: DotNetCoreCLI@2
+  name: 'Tests'
+  displayName: 'Run tests'
+  inputs:
+    command: 'test'
+    arguments: '--configuration $(BuildConfiguration)'
+  
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
-    publishWebProjects: true
-    arguments: '--configuration $(buildConfiguration)'
+    publishWebProjects: false
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: true
