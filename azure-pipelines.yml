@@ -5,9 +5,14 @@ pool:
   vmImage: windows-latest
 
 variables:
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  - name: buildPlatform
+    value: 'Any CPU'
+  
+  - name: buildConfiguration
+    value: 'Release'
+
   - group: setA
+
 
 steps:
 - script: echo $(Server)
