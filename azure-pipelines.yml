@@ -4,6 +4,15 @@ trigger:
 pool:
   vmImage: windows-latest
 
+parameters:
+  - name: environment
+    displayName: "Choose environment"
+    type: string
+    default: "dev"
+    values:
+      - dev
+      - prod
+
 variables:
   - name: buildPlatform
     value: 'Any CPU'
@@ -11,7 +20,11 @@ variables:
   - name: buildConfiguration
     value: 'Release'
 
-  - group: setA
+  - ${{ if eq(parameters.environment, 'dev') }}:
+      - group: SetA
+
+  - ${{ if eq(parameters.environment, 'prod') }}:
+      - group: SetB
 
 
 steps:
