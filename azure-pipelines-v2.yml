@@ -14,6 +14,10 @@ parameters:
       - prod
 
 variables:
+  - name: environmentName
+    value: ${{ if eq(variables['Build.SourceBranchName'], 'develop') }} 'develop' 
+            ${{ else }} 'develop'
+            
   - name: buildPlatform
     value: 'Any CPU'
   
@@ -68,7 +72,7 @@ stages:
   jobs:
   - deployment: DeployToAppService
     displayName: 'Deploy to Azure App Service'
-    environment: develop
+    environment: $(environmentName)
     strategy:
       runOnce:
         deploy:
