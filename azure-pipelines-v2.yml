@@ -1,0 +1,87 @@
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+parameters:
+  - name: environment
+    displayName: "Choose environment"
+    type: string
+    default: "dev"
+    values:
+      - dev
+      - prod
+
+variables:
+  - name: buildPlatform
+    value: 'Any CPU'
+  
+  - name: buildConfiguration
+    value: 'Release'
+
+  - ${{ if eq(parameters.environment, 'dev') }}:
+      - group: SetA
+
+  - ${{ if eq(parameters.environment, 'prod') }}:
+      - group: SetB
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    steps:
+    - script: echo $(Server)
+
+    - task: NuGetToolInstaller@1
+      name: 'NuGetToolInstaller'
+      displayName: 'NuGet Install'
+
+    - task: NuGetCommand@2
+      name: 'NuGetRestore'
+      displayName: 'NuGet Restore Packages'
+      inputs:
+        command: 'restore'
+
+    - task: DotNetCoreCLI@2
+      name: 'Tests'
+      displayName: 'Run Tests'
+      inputs:
+        command: 'test'
+        arguments: '--configuration $(BuildConfiguration)'
+    
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        zipAfterPublish: true
+      displayName: 'Publish'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifacts'
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: 'drop'
+
+- stage: Deploy
+  jobs:
+  - deployment: DeployToAppService
+    displayName: 'Deploy to Azure App Service'
+    environment: develop
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Build Artifacts'
+            inputs:
+              artifactName: 'drop'
+              downloadPath: '$(Pipeline.Workspace)'
+          
+          - task: AzureWebApp@1
+            displayName: 'Deploy to Azure App Service'
+            inputs:
+              azureSubscription: 'sc-myapp-pep'
+              appName: 'rg-appservice-pep-dev-01'
+              package: '$(Pipeline.Workspace)/drop/**/*.zip'
