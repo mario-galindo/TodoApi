@@ -15,8 +15,7 @@ parameters:
 
 variables:
   - name: environmentName
-    value: ${{ if eq(variables['Build.SourceBranchName'], 'develop') }} 'develop' 
-            ${{ else }} 'develop'
+    value: ${{ if eq(variables['Build.SourceBranchName'], 'develop') }} 'develop'
             
   - name: buildPlatform
     value: 'Any CPU'
