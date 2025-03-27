@@ -83,5 +83,5 @@ stages:
             displayName: 'Deploy to Azure App Service'
             inputs:
               azureSubscription: 'sc-myapp-pep'
-              appName: 'rg-appservice-pep-dev-01'
+              appName: 'myapp-pep'
               package: '$(Pipeline.Workspace)/drop/**/*.zip'
