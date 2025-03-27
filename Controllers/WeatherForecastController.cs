@@ -8,7 +8,7 @@ public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
     {
-        "Change From Github 3", "Change From Github 3", "Change From Github 3"
+        "Change From Github 4", "Change From Github 4", "Change From Github 4"
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
